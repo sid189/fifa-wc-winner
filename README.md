@@ -38,19 +38,48 @@ That's enough to get a prediction. The richer workflow follows.
 
 ## Run targets
 
+The scripts come in three layers: **interactive** (terminal output, fast to iterate on), **reports** (markdown + HTML + PNG charts, for sharing), and **experiments** (A/B tests of specific model changes).
+
+### Interactive (stdout)
+
+Run these while iterating. Output is a terminal-printed table; no files written.
+
+| Script | Purpose |
+| --- | --- |
+| `baseline.py` | Group-stage forecasts, chalk-path bracket, 10k MC top-15 ranking. |
+| `backtest_2022.py` | Single-year backtest. Argentina rank #2 = validation pass. |
+| `backtest_all.py` | 7-tournament backtest (1998-2022); auto verdict. |
+| `compare_market.py` | Model P(champion) vs bookmaker outright odds, devigged. |
+| `compare_models.py` | Logistic vs GBM vs RF vs MLP vs NB vs XGB vs LGBM vs CatBoost. |
+| `blend_market.py` | Weighted blend of model + market across multiple w values. |
+| `scripts/list_teams.py` | Verify team-name spellings in the dataset. |
+| `scripts/fetch_squad_values.py` | Populate `data/squad_values.csv` for 2026 via Transfermarkt API. |
+
+### Reports (markdown + HTML + charts)
+
+Each writes both `.md` (image refs to `figures/`) and `.html` (single-file with base64-embedded charts). Open the `.html` in any browser.
+
 | Script | Output | Purpose |
 | --- | --- | --- |
-| `baseline.py` | stdout tables | Group-stage forecasts, chalk-path bracket, 10k MC ranking. |
-| `backtest_2022.py` | stdout | Honest 2022 backtest. Argentina rank #2 = validation pass. |
-| `backtest_all.py` | stdout | 2014 + 2018 + 2022 freeze-and-predict; multi-year verdict. |
-| `compare_market.py` | stdout | Model P(champion) vs bookmaker outright odds, devigged. |
-| `compare_models.py` | stdout | Logistic vs GBM vs RF vs MLP vs NB on H/D/A; log_loss + Brier. |
-| `report.py` | `report.{md,html}` + `figures/` | Full prediction report with 6 charts. |
+| `report.py` | `report.{md,html}` + `figures/` | Full 2026 prediction report (6 charts). |
 | `report_backtests.py` | `report_backtests.{md,html}` | Multi-tournament validation report. |
 | `report_market.py` | `report_market.{md,html}` | Market calibration report. |
 | `report_models.py` | `report_models.{md,html}` | ML model comparison report. |
-| `notebooks/baseline.ipynb` | interactive | Same pipeline in a notebook. |
-| `scripts/list_teams.py` | stdout | Verify team-name spellings in the dataset. |
+
+### Experiments (A/B tests)
+
+Each runs the multi-year backtest twice (with vs without the change) and prints a comparison table + auto verdict.
+
+| Script | Hypothesis under test |
+| --- | --- |
+| `experiment_conmebol_k.py` | Halving K for CONMEBOL qualifiers fixes Brazil 2002. |
+| `experiment_squad_value.py` | Squad-value Elo augmentation fixes Brazil 2002 + Italy 2006. |
+
+### Notebook
+
+| File | Purpose |
+| --- | --- |
+| `notebooks/baseline.ipynb` | Same pipeline as `baseline.py` but interactive. |
 
 ---
 
