@@ -23,29 +23,33 @@ from src.groups_2026 import GROUPS_2026, HOST_TEAMS_2026, bracket_2026
 from src.market import implied_from_decimal, compare_to_market
 
 
-# Decimal odds (template - REPLACE with current values from a real book).
-# These are rough placeholders to illustrate the workflow.
+# Decimal outright odds, sourced from ESPN / FanDuel (June 2026).
+# Italy not included (did not qualify for 2026).
 CURRENT_ODDS: dict[str, float] = {
-    "Spain":         8.0,
-    "Argentina":     8.5,
-    "France":        9.0,
-    "England":      10.0,
-    "Brazil":       11.0,
-    "Germany":      15.0,
-    "Portugal":     17.0,
-    "Netherlands":  19.0,
-    "Belgium":      26.0,
-    "Italy":        29.0,
-    "Croatia":      41.0,
-    "Uruguay":      51.0,
-    "Colombia":     51.0,
-    "Switzerland":  81.0,
-    "United States": 81.0,
-    "Mexico":      151.0,
-    "Japan":       151.0,
-    "Morocco":     151.0,
-    "Ecuador":     251.0,
-    "Norway":      301.0,
+    "Spain":          5.50,
+    "France":         5.75,
+    "England":        8.00,
+    "Portugal":       9.50,
+    "Argentina":     10.00,
+    "Brazil":        10.50,
+    "Germany":       15.00,
+    "Netherlands":   21.00,
+    "Norway":        36.00,
+    "Belgium":       41.00,
+    "Colombia":      41.00,
+    "Morocco":       51.00,
+    "United States": 61.00,
+    "Switzerland":   66.00,
+    "Uruguay":       66.00,
+    "Japan":         66.00,
+    "Mexico":        81.00,
+    "Ecuador":       81.00,
+    "Turkey":        91.00,
+    "Croatia":       91.00,
+    "Senegal":       91.00,
+    "Sweden":       121.00,
+    "Austria":      151.00,
+    "Canada":       201.00,
 }
 
 

@@ -20,6 +20,10 @@ from src.data import load_results
 from src.elo import compute_elo_history
 from src.model import fit_outcome_model
 from src.simulate import monte_carlo
+from src.groups_1998 import GROUPS_1998, bracket_1998, ACTUAL_1998
+from src.groups_2002 import GROUPS_2002, bracket_2002, ACTUAL_2002
+from src.groups_2006 import GROUPS_2006, bracket_2006, ACTUAL_2006
+from src.groups_2010 import GROUPS_2010, bracket_2010, ACTUAL_2010
 from src.groups_2014 import GROUPS_2014, bracket_2014, ACTUAL_2014
 from src.groups_2018 import GROUPS_2018, bracket_2018, ACTUAL_2018
 from src.groups_2022 import GROUPS_2022, bracket_2022
@@ -41,6 +45,10 @@ class TournamentConfig:
 
 
 CONFIGS = [
+    TournamentConfig(1998, "1998-06-10", GROUPS_1998, bracket_1998, ACTUAL_1998),
+    TournamentConfig(2002, "2002-05-31", GROUPS_2002, bracket_2002, ACTUAL_2002),
+    TournamentConfig(2006, "2006-06-09", GROUPS_2006, bracket_2006, ACTUAL_2006),
+    TournamentConfig(2010, "2010-06-11", GROUPS_2010, bracket_2010, ACTUAL_2010),
     TournamentConfig(2014, "2014-06-12", GROUPS_2014, bracket_2014, ACTUAL_2014),
     TournamentConfig(2018, "2018-06-14", GROUPS_2018, bracket_2018, ACTUAL_2018),
     TournamentConfig(2022, "2022-11-20", GROUPS_2022, bracket_2022, ACTUAL_2022),
@@ -50,7 +58,10 @@ CONFIGS = [
 def run_backtest(cfg: TournamentConfig, all_results: pd.DataFrame, n_sims: int = 10_000) -> dict:
     pre = all_results[all_results["date"] < pd.Timestamp(cfg.start_date)].reset_index(drop=True)
     ratings, snapshots = compute_elo_history(pre)
-    model = fit_outcome_model(snapshots, min_date="2006-01-01")
+    # Train the outcome model on the 16-year window before the tournament.
+    # Hardcoding 2006 here would leave the 1998/2002 backtests with no training data.
+    train_start = pd.Timestamp(cfg.start_date) - pd.DateOffset(years=16)
+    model = fit_outcome_model(snapshots, min_date=str(train_start.date()))
 
     missing = [t for grp in cfg.groups.values() for t in grp if t not in ratings]
     if missing:
