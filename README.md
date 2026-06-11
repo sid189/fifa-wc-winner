@@ -2,7 +2,7 @@
 
 Forecast the 2026 World Cup winner from 150 years of international match results, World Football Elo ratings, and a multinomial outcome model. Includes a Monte Carlo simulator that respects FIFA's actual 48-team format (12 groups, top-2 + 8-best-thirds → R32), a multi-tournament backtest validation suite, and tooling for comparing against bookmaker odds and alternative ML algorithms.
 
-> **Validation status:** 2022 backtest places Argentina at rank #2 in predicted P(champion). The eventual champion in the top 2 → methodology has signal.
+> **Validation status:** 7-tournament backtest (1998-2022) hits the eventual champion within the predicted top 6 in **5 of 7 years**. Wins include Spain 2010 at rank #1 and Argentina 2022 at rank #2; misses are Brazil 2002 (rank #9) and Italy 2006 (rank #8). Signal is real but noisy — see the Known limitations section.
 
 ---
 
@@ -118,17 +118,17 @@ Multinomial logistic regression on `[elo_diff, |elo_diff|, is_friendly, is_wc, i
 
 ## Validation
 
-| Year | Champion | Predicted rank | P(champion) |
-| --- | --- | --- | --- |
-| 1998 | France | (run `backtest_all.py`) | — |
-| 2002 | Brazil | (run `backtest_all.py`) | — |
-| 2006 | Italy | (run `backtest_all.py`) | — |
-| 2010 | Spain | (run `backtest_all.py`) | — |
-| 2014 | Germany | (run `backtest_all.py`) | — |
-| 2018 | France | (run `backtest_all.py`) | — |
-| 2022 | Argentina | **#2** | 13.3% |
+| Year | Champion | Predicted rank | P(champion) | Hit (top 6)? |
+| --- | --- | --- | --- | --- |
+| 1998 | France | #4 | 8.1% | yes |
+| 2002 | Brazil | #9 | 2.8% | **no** |
+| 2006 | Italy | #8 | 5.5% | **no** |
+| 2010 | Spain | #1 | 22.2% | yes |
+| 2014 | Germany | #3 | 15.6% | yes |
+| 2018 | France | #6 | 4.7% | yes |
+| 2022 | Argentina | #2 | 21.3% | yes |
 
-A single passing backtest is suggestive; the multi-year backtest is the strong validation. Run `python backtest_all.py` (and the corresponding `report_backtests.py`) before treating the 2026 numbers as decision-grade.
+**Overall: 5/7 top-6 hits.** The two misses (Brazil 2002, Italy 2006) share a pattern — strong squads with depressed pre-tournament Elo from qualification stumbles or recent form dips. Suspected fixes: squad-value Elo augmentation (`experiment_squad_value.py`) and the CONMEBOL K-factor override (`experiment_conmebol_k.py`). Re-run `python backtest_all.py` after any model change.
 
 ---
 
