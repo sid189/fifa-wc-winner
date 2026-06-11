@@ -172,18 +172,6 @@ External references:
 
 ---
 
-## Next steps to tighten the prediction
-
-In rough order of expected ROI:
-
-1. **Run the multi-year backtest** if you haven't (`python backtest_all.py`). Single most important step.
-2. **Refresh `compare_market.py` with current bookmaker odds** and inspect the model-vs-market diff for Spain, Brazil, and the CONMEBOL mid-tier.
-3. **Add a host-knockout boost** to `simulate.py` (treat as half-strength: ~+50 Elo for hosts in KO games hosted in their own country).
-4. **Train on richer features**: squad market value (Transfermarkt), recent form (last-10 rolling goal diff), key player availability.
-5. **Blend with the market**: final `P(champion) = w·model + (1-w)·implied_market`, tune `w` on 2014-2022 holdout.
-
----
-
 ## License
 
 This is a personal forecasting project. The match data is sourced from a public CC0 dataset; the model code is yours to fork and adapt.

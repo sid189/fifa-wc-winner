@@ -71,7 +71,7 @@ def _render(make_chart: Callable, name: str) -> tuple[Path, str]:
 def main() -> None:
     print("[1/5] Running data pipeline...")
     results = load_results()
-    ratings, snapshots = compute_elo_history(results)
+    ratings, snapshots = compute_elo_history(results, conmebol_qualifier_k_factor=0.5)
     model = fit_outcome_model(snapshots, min_date="2006-01-01")
 
     print("[2/5] Monte Carlo (10k sims)...")
@@ -79,6 +79,7 @@ def main() -> None:
         GROUPS_2026, ratings, model,
         n_sims=10_000, seed=42,
         host_teams=HOST_TEAMS_2026,
+        host_ko_boost=50.0,
         bracket_fn=bracket_2026,
     )
 

@@ -1,6 +1,6 @@
 # FIFA World Cup 2026 - Prediction Report
 
-*Generated: 2026-06-11 01:48*
+*Generated: 2026-06-11 08:36*
 *Methodology: World Football Elo + multinomial logit + 10,000 Monte Carlo simulations*
 *Backtest validation: 2022 (Argentina ranked #2 - methodology has signal)*
 
@@ -8,13 +8,13 @@
 
 ## Executive summary
 
-- **Predicted champion**: Spain (22.2%)
-- **Top 5**: **Spain** (22.2%), **Argentina** (13.3%), **France** (9.8%), **England** (8.4%), **Brazil** (4.6%)
+- **Predicted champion**: Spain (21.4%)
+- **Top 5**: **Spain** (21.4%), **Argentina** (16.1%), **France** (9.6%), **England** (7.7%), **Brazil** (5.9%)
 - **Chalk-path final**: France vs Spain -> Spain
 - **Chalk-path third place**: England vs Argentina -> Argentina
 - **Chalk-path semifinals**: France vs England | Spain vs Argentina
-- **Surprise teams in top 15**: Ecuador (4.6%), Norway (2.4%), Turkey (2.3%), Morocco (2.2%), Switzerland (1.9%)
-- **Bracket asymmetry**: upper half 45% vs lower half 54%. The lower bracket is meaningfully stronger; bottom-half teams face tougher paths.
+- **Surprise teams in top 15**: Ecuador (2.6%), Norway (2.4%), Turkey (2.2%), Morocco (2.0%)
+- **Bracket asymmetry**: upper half 44% vs lower half 55%. The lower bracket is meaningfully stronger; bottom-half teams face tougher paths.
 
 ## Top 15 contenders
 
@@ -22,21 +22,21 @@
 
 | team        |      elo |   P(R16) |   P(QF) |   P(SF) |   P(F) |   P(Champ) |
 |:------------|---------:|---------:|--------:|--------:|-------:|-----------:|
-| Spain       | 2237.652 |    0.767 |   0.564 |   0.453 |  0.322 |      0.222 |
-| Argentina   | 2181.704 |    0.668 |   0.502 |   0.366 |  0.212 |      0.133 |
-| France      | 2140.419 |    0.688 |   0.439 |   0.292 |  0.183 |      0.098 |
-| England     | 2122.304 |    0.679 |   0.425 |   0.260 |  0.152 |      0.084 |
-| Brazil      | 2066.380 |    0.574 |   0.346 |   0.190 |  0.102 |      0.046 |
-| Ecuador     | 2063.400 |    0.598 |   0.332 |   0.192 |  0.102 |      0.046 |
-| Colombia    | 2065.003 |    0.578 |   0.324 |   0.175 |  0.085 |      0.044 |
-| Germany     | 2017.908 |    0.550 |   0.282 |   0.152 |  0.074 |      0.030 |
-| Portugal    | 2027.514 |    0.530 |   0.280 |   0.141 |  0.062 |      0.029 |
-| Netherlands | 2018.427 |    0.487 |   0.276 |   0.132 |  0.065 |      0.027 |
-| Norway      | 2023.785 |    0.485 |   0.249 |   0.130 |  0.061 |      0.024 |
-| Japan       | 2013.935 |    0.468 |   0.260 |   0.124 |  0.058 |      0.023 |
-| Turkey      | 2009.828 |    0.487 |   0.252 |   0.112 |  0.049 |      0.023 |
-| Morocco     | 2007.360 |    0.466 |   0.253 |   0.120 |  0.055 |      0.022 |
-| Switzerland | 1975.521 |    0.568 |   0.282 |   0.111 |  0.046 |      0.019 |
+| Spain       | 2237.789 |    0.761 |   0.556 |   0.448 |  0.310 |      0.214 |
+| Argentina   | 2214.728 |    0.695 |   0.546 |   0.405 |  0.244 |      0.161 |
+| France      | 2141.706 |    0.695 |   0.447 |   0.295 |  0.185 |      0.096 |
+| England     | 2122.337 |    0.675 |   0.413 |   0.250 |  0.144 |      0.077 |
+| Brazil      | 2093.792 |    0.614 |   0.384 |   0.221 |  0.125 |      0.059 |
+| Colombia    | 2087.762 |    0.611 |   0.355 |   0.191 |  0.095 |      0.051 |
+| Germany     | 2017.750 |    0.557 |   0.281 |   0.146 |  0.071 |      0.030 |
+| Ecuador     | 2023.848 |    0.535 |   0.275 |   0.144 |  0.069 |      0.026 |
+| Mexico      | 1967.146 |    0.613 |   0.309 |   0.143 |  0.067 |      0.026 |
+| Portugal    | 2027.190 |    0.522 |   0.264 |   0.130 |  0.055 |      0.025 |
+| Netherlands | 2016.783 |    0.476 |   0.267 |   0.128 |  0.062 |      0.025 |
+| Norway      | 2023.474 |    0.488 |   0.253 |   0.131 |  0.062 |      0.024 |
+| Turkey      | 2010.546 |    0.514 |   0.264 |   0.112 |  0.049 |      0.022 |
+| Morocco     | 2004.358 |    0.457 |   0.244 |   0.116 |  0.051 |      0.020 |
+| Japan       | 2010.127 |    0.454 |   0.247 |   0.115 |  0.053 |      0.020 |
 
 ## Tournament progression funnel
 
@@ -72,17 +72,17 @@ UEFA's dominance is expected; the key question is how concentrated the CONMEBOL 
 
 **Top 5 matches most likely to end in a draw:**
 
-| group   | team_a        | team_b   |   p_draw |   p_a_win |   p_b_win |
-|:--------|:--------------|:---------|---------:|----------:|----------:|
-| F       | Tunisia       | Sweden   |     0.29 |      0.36 |      0.36 |
-| D       | United States | Paraguay |     0.29 |      0.34 |      0.38 |
-| K       | Portugal      | Colombia |     0.29 |      0.33 |      0.38 |
-| D       | Paraguay      | Turkey   |     0.29 |      0.33 |      0.38 |
-| J       | Algeria       | Austria  |     0.29 |      0.37 |      0.34 |
+| group   | team_a     | team_b       |   p_draw |   p_a_win |   p_b_win |
+|:--------|:-----------|:-------------|---------:|----------:|----------:|
+| D       | Paraguay   | Australia    |     0.29 |      0.35 |      0.36 |
+| F       | Tunisia    | Sweden       |     0.29 |      0.36 |      0.35 |
+| E       | Germany    | Ecuador      |     0.29 |      0.37 |      0.34 |
+| J       | Algeria    | Austria      |     0.29 |      0.37 |      0.34 |
+| H       | Cape Verde | Saudi Arabia |     0.29 |      0.32 |      0.39 |
 
 ## Risk factors and caveats
 
-1. **Spain at 22.2%** is high relative to typical market pricing. Run `python compare_market.py` after updating with current odds.
+1. **Spain at 21.4%** is high relative to typical market pricing. Run `python compare_market.py` after updating with current odds.
 2. **Host advantage only applies in group stage.** Knockouts treated as neutral despite most games being in the USA.
 3. **CONMEBOL Elo inflation.** Treat Ecuador/Colombia/Uruguay championship probabilities with extra skepticism.
 4. **Single-tournament backtest.** Argentina #2 in 2022 is strong, but n=1. Run `python backtest_all.py`.

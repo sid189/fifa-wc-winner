@@ -30,7 +30,7 @@ def main() -> None:
           f"({results.date.min().date()} -> {results.date.max().date()})")
 
     print("Computing Elo ratings over full history...")
-    ratings, snapshots = compute_elo_history(results)
+    ratings, snapshots = compute_elo_history(results, conmebol_qualifier_k_factor=0.5)
     print("\nCurrent top 15 Elo:")
     print(top_n(ratings, 15).to_string(index=False))
 
@@ -68,6 +68,7 @@ def main() -> None:
     predictions = monte_carlo(GROUPS_2026, ratings, model,
                               n_sims=10_000, seed=42,
                               host_teams=HOST_TEAMS_2026,
+                              host_ko_boost=50.0,
                               bracket_fn=bracket_2026)
 
     print("\n2026 WORLD CUP - TOP 15 BY P(CHAMPION)")

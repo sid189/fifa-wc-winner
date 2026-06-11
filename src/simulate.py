@@ -51,8 +51,12 @@ def _sim_group(group: list[str], ratings: dict, model: OutcomeModel,
     return standings, pts, gd
 
 
-def _ko(model: OutcomeModel, ratings: dict, a: str, b: str, rng: np.random.Generator) -> str:
-    p = knockout_win_proba(model, ratings[a], ratings[b], neutral=True)
+def _ko(model: OutcomeModel, ratings: dict, a: str, b: str,
+        rng: np.random.Generator, hosts: set[str] | None = None,
+        ko_boost: float = 0.0) -> str:
+    elo_a = ratings[a] + (ko_boost if hosts and a in hosts else 0.0)
+    elo_b = ratings[b] + (ko_boost if hosts and b in hosts else 0.0)
+    p = knockout_win_proba(model, elo_a, elo_b, neutral=True)
     return a if rng.random() < p else b
 
 
@@ -74,6 +78,7 @@ def simulate_tournament(
     n_third_qualifiers: int = 8,
     bracket_fn: Optional[BracketFn] = None,
     host_teams: Optional[set[str]] = None,
+    host_ko_boost: float = 0.0,
 ) -> dict:
     """Play one full tournament.
 
@@ -82,8 +87,11 @@ def simulate_tournament(
                 Receives dicts keyed by group name. Defaults to random shuffle.
     host_teams: nations that play group games at home (e.g. {"United States",
                 "Mexico", "Canada"} for 2026). Gets +100 Elo on those games.
-                Knockouts are treated as neutral (host doesn't always play in
-                its own country once the bracket starts).
+    host_ko_boost: Elo bonus for host nations during knockout matches. Use ~50
+                for 2026 where most KO games are in the USA (half the group
+                boost since hosts don't always play in their own country in KO).
+                Default 0 for historical backtests where hosts played all games
+                at home (their boost is fully captured by neutral=False).
     """
     firsts: dict[str, str] = {}
     seconds: dict[str, str] = {}
@@ -109,7 +117,8 @@ def simulate_tournament(
     for stage in _stage_names_for(len(bracket)):
         nxt = []
         for i in range(0, len(bracket), 2):
-            w = _ko(model, ratings, bracket[i], bracket[i + 1], rng)
+            w = _ko(model, ratings, bracket[i], bracket[i + 1], rng,
+                    hosts=host_teams, ko_boost=host_ko_boost)
             stage_reached[w] = stage
             nxt.append(w)
         bracket = nxt
@@ -126,6 +135,7 @@ def monte_carlo(
     n_third_qualifiers: int = 8,
     bracket_fn: Optional[BracketFn] = None,
     host_teams: Optional[set[str]] = None,
+    host_ko_boost: float = 0.0,
 ) -> pd.DataFrame:
     missing = [t for grp in groups.values() for t in grp if t not in ratings]
     if missing:
@@ -146,6 +156,7 @@ def monte_carlo(
             n_third_qualifiers=n_third_qualifiers,
             bracket_fn=bracket_fn,
             host_teams=host_teams,
+            host_ko_boost=host_ko_boost,
         )
         for team, st in res["stage_reached"].items():
             if st in final_stage:

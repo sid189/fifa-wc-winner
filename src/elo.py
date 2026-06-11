@@ -15,6 +15,14 @@ from tqdm import tqdm
 DEFAULT_RATING = 1500.0
 HOME_ADV = 100.0
 
+# 10 CONMEBOL members. Used for the qualifier-K override experiment that tests
+# whether CONMEBOL's brutal round-robin qualification format unfairly deflates
+# big-team Elo (Brazil-2002 was rank #9 in the model; suspected fix.)
+CONMEBOL_TEAMS: set[str] = {
+    "Argentina", "Bolivia", "Brazil", "Chile", "Colombia",
+    "Ecuador", "Paraguay", "Peru", "Uruguay", "Venezuela",
+}
+
 # Tournament weight (K). Keys are matched as case-insensitive substrings.
 K_BY_TOURNAMENT = {
     "fifa world cup": 60,
@@ -54,8 +62,17 @@ def expected(rating_a: float, rating_b: float) -> float:
     return 1.0 / (1.0 + 10 ** ((rating_b - rating_a) / 400.0))
 
 
-def compute_elo_history(results: pd.DataFrame) -> tuple[dict[str, float], pd.DataFrame]:
+def compute_elo_history(
+    results: pd.DataFrame,
+    conmebol_qualifier_k_factor: float = 1.0,
+) -> tuple[dict[str, float], pd.DataFrame]:
     """Run Elo over the full match history.
+
+    Args:
+        conmebol_qualifier_k_factor: multiplier on K for CONMEBOL-vs-CONMEBOL
+            qualification matches. 1.0 = default (no change); 0.5 = halve
+            the K factor to test whether CONMEBOL Elo is depressed by its
+            qualification format. (See backtest_all.py — Brazil-2002 puzzle.)
 
     Returns:
         ratings: final rating per team
@@ -83,6 +100,10 @@ def compute_elo_history(results: pd.DataFrame) -> tuple[dict[str, float], pd.Dat
             s_home = 0.5
 
         k = k_for(r.tournament) * mov_multiplier(gd)
+        if (conmebol_qualifier_k_factor != 1.0
+                and "qualification" in (r.tournament or "").lower()
+                and home in CONMEBOL_TEAMS and away in CONMEBOL_TEAMS):
+            k *= conmebol_qualifier_k_factor
         delta = k * (s_home - e_home)
 
         rows.append(
