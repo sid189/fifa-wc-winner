@@ -65,6 +65,7 @@ Each writes both `.md` (image refs to `figures/`) and `.html` (single-file with 
 | `report_backtests.py` | `report_backtests.{md,html}` | Multi-tournament validation report. |
 | `report_market.py` | `report_market.{md,html}` | Market calibration report. |
 | `report_models.py` | `report_models.{md,html}` | ML model comparison report. |
+| `report_models_2026.py` | `report_models_2026.{md,html}` | Model zoo scored against the actual, completed 2026 WC results. |
 
 ### Experiments (A/B tests)
 
