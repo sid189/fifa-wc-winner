@@ -3,6 +3,8 @@
 Forecast the 2026 World Cup winner from 150 years of international match results, World Football Elo ratings, and a multinomial outcome model. Includes a Monte Carlo simulator that respects FIFA's actual 48-team format (12 groups, top-2 + 8-best-thirds → R32), a multi-tournament backtest validation suite, and tooling for comparing against bookmaker odds and alternative ML algorithms.
 
 > **Validation status:** 7-tournament backtest (1998-2022) hits the eventual champion within the predicted top 6 in **5 of 7 years**. Wins include Spain 2010 at rank #1 and Argentina 2022 at rank #2; misses are Brazil 2002 (rank #9) and Italy 2006 (rank #8). Signal is real but noisy — see the Known limitations section.
+>
+> **2026, scored against the actual tournament:** the pre-tournament model ranked Spain #1 and Argentina #2 — they finished champion and runner-up. Knockout-stage pick accuracy was 78.1% (Brier 0.151 vs. 0.25 coin-flip). Group-stage was weaker (62.5% pick accuracy) and missed all 20 actual draws. Swapping the production logistic regression for a stronger algorithm (GBM, CatBoost, XGBoost, ...) does **not** help — all 8 models in the zoo score within noise of each other against the real results. Details: [Validation](#validation) and `report_models_2026.md`.
 
 ---
 
@@ -49,6 +51,7 @@ Run these while iterating. Output is a terminal-printed table; no files written.
 | `baseline.py` | Group-stage forecasts, chalk-path bracket, 10k MC top-15 ranking. |
 | `backtest_2022.py` | Single-year backtest. Argentina rank #2 = validation pass. |
 | `backtest_all.py` | 7-tournament backtest (1998-2022); auto verdict. |
+| `backtest_2026_progress.py` | Scores the frozen pre-tournament model against the actual, completed 2026 WC (group + knockout results hardcoded from FIFA/ESPN/Al Jazeera). |
 | `compare_market.py` | Model P(champion) vs bookmaker outright odds, devigged. |
 | `compare_models.py` | Logistic vs GBM vs RF vs MLP vs NB vs XGB vs LGBM vs CatBoost. |
 | `blend_market.py` | Weighted blend of model + market across multiple w values. |
@@ -93,12 +96,14 @@ fifa-wc-winner/
 ├── baseline.py                end-to-end CLI runner
 ├── backtest_2022.py           single-year backtest
 ├── backtest_all.py            multi-year backtest
+├── backtest_2026_progress.py  scores frozen model vs actual 2026 WC results
 ├── compare_market.py          model vs bookmaker odds
 ├── compare_models.py          ML algo comparison
 ├── report.py                  full prediction report (md + html)
 ├── report_backtests.py        backtest report (md + html)
 ├── report_market.py           market calibration report (md + html)
 ├── report_models.py           ML comparison report (md + html)
+├── report_models_2026.py      ML comparison vs actual 2026 results (md + html)
 ├── data/                      cached match data
 ├── figures/                   generated chart PNGs
 ├── notebooks/baseline.ipynb   notebook walkthrough
@@ -148,6 +153,8 @@ Multinomial logistic regression on `[elo_diff, |elo_diff|, is_friendly, is_wc, i
 
 ## Validation
 
+### Historical backtest (1998-2022)
+
 | Year | Champion | Predicted rank | P(champion) | Hit (top 6)? |
 | --- | --- | --- | --- | --- |
 | 1998 | France | #4 | 8.1% | yes |
@@ -160,6 +167,26 @@ Multinomial logistic regression on `[elo_diff, |elo_diff|, is_friendly, is_wc, i
 
 **Overall: 5/7 top-6 hits.** The two misses (Brazil 2002, Italy 2006) share a pattern — strong squads with depressed pre-tournament Elo from qualification stumbles or recent form dips. Suspected fixes: squad-value Elo augmentation (`experiment_squad_value.py`) and the CONMEBOL K-factor override (`experiment_conmebol_k.py`). Re-run `python backtest_all.py` after any model change.
 
+### 2026, scored against the actual tournament
+
+Run: `python backtest_2026_progress.py` (frozen pre-tournament ratings/model, scored against the real 104-match results).
+
+| Stage | Pick accuracy | Brier score | Baseline |
+| --- | --- | --- | --- |
+| Group (72 matches) | 62.5% (45/72) | 0.535 | 0.667 = uniform random |
+| Knockout (32 matches) | 78.1% (25/32) | 0.151 | 0.25 = coin flip |
+
+| Placement | Team | Pre-tournament model rank |
+| --- | --- | --- |
+| Champion | Spain | #1 |
+| Runner-up | Argentina | #2 |
+| 3rd place | England | #4 |
+| 4th place | France | #3 |
+
+The model called the top of the bracket correctly — both finalists were its top 2 picks pre-tournament, and the knockout Brier score comfortably beats a coin flip. The group stage is weaker: 27.8% of matches (20/72) ended in a draw, and the model never predicted a draw as the most-likely outcome for a single one of them (knockout draws are handled via the 50/50 penalty-shootout proxy; group draws are not).
+
+**Does a different algorithm do better?** `report_models_2026.py` retrains the full model zoo (logistic, gradient boosting, random forest, MLP, naive Bayes, XGBoost, LightGBM, CatBoost) on identical features and scores each against these same 104 matches — the results never existed anywhere in training data, so this is a genuine out-of-sample test. All 8 models land within noise of each other (knockout Brier 0.149-0.163); CatBoost/gradient boosting edge out logistic regression by less than 0.005 Brier on a 32-match sample, which isn't enough evidence to swap the production model. See `report_models_2026.md` for the full table — this echoes what `report_models.py` already found on the 2021-2022 historical test set: the ceiling here is feature-limited, not algorithm-limited.
+
 ---
 
 ## Known limitations
@@ -169,18 +196,20 @@ Multinomial logistic regression on `[elo_diff, |elo_diff|, is_friendly, is_wc, i
 3. **R32 third-slot variance.** When the same 8 thirds qualify across sims, FIFA's cluster constraints often allow multiple valid slottings; the backtracker picks the first valid one. Averages out over 10k sims for aggregate P(champion) but can bias path-dependent stats.
 4. **No injury/availability inputs.** A key absence (e.g. starting GK out for the tournament) can swing P(champion) by ~2-3pp and is not in the dataset.
 5. **Single-tournament backtest only by default.** 2022 alone may be lucky; run the multi-year backtest before trusting the 2026 numbers.
+6. **Group-stage draws are underpredicted.** Confirmed against the actual 2026 results: draws were the most-likely outcome in 27.8% of group matches (20/72) but the model never predicted a draw as the favorite in any of them. Knockout draws are handled via a 50/50 penalty-shootout proxy; group draws are not modelled with an equivalent adjustment.
 
 ---
 
 ## Comparative study scripts
 
-The repo includes three orthogonal "is the model any good?" checks:
+The repo includes four orthogonal "is the model any good?" checks:
 
 - **vs market** (`compare_market.py` + `report_market.py`): does the model agree with the wisdom of crowds? Large gaps are alpha or bug.
-- **vs alternative ML algorithms** (`compare_models.py` + `report_models.py`): does logistic regression underperform gradient boosting? If yes, non-linear interactions are present.
+- **vs alternative ML algorithms** (`compare_models.py` + `report_models.py`): does logistic regression underperform gradient boosting on a historical test set? If yes, non-linear interactions are present.
 - **vs prior tournaments** (`backtest_all.py` + `report_backtests.py`): is the 2022 result lucky or repeatable?
+- **vs the actual 2026 result** (`backtest_2026_progress.py`, `report_models_2026.py`): how did the live pick actually do, and would a different algorithm have done better on the same real matches?
 
-Run all three before making any large claim about the prediction.
+Run all four before making any large claim about the prediction.
 
 ---
 
